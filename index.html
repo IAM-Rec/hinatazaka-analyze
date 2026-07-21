@@ -3,153 +3,447 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>日向坂46 · 歌词深度解读</title>
+    <title>日向坂46 · 深度解读库</title>
     <style>
+        /* ===== 全局重置 & 日向坂主题色 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
-            background: #fcf8f5;
-            color: #2d2a24;
-            padding: 2rem 1rem;
+        :root {
+            --primary: #D45A6A;      /* 日向坂红 */
+            --primary-light: #F5E0E0;
+            --primary-dark: #A8354A;
+            --bg: #FCF8F5;
+            --card-bg: #FFFFFF;
+            --text: #2D2A24;
+            --text-light: #7A5A5A;
+            --shadow: 0 4px 24px rgba(180, 80, 80, 0.08);
+            --radius: 20px;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 1.5rem 1rem;
+            min-height: 100vh;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* ===== Logo & 头部 ===== */
         header {
             text-align: center;
-            padding: 2.5rem 0 2rem;
-            border-bottom: 4px solid #f0c8c8;
-            margin-bottom: 2.5rem;
+            padding: 2rem 0 1.8rem;
+            border-bottom: 4px solid var(--primary-light);
+            margin-bottom: 2rem;
+            position: relative;
         }
-        h1 {
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .logo-icon {
             font-size: 2.8rem;
-            background: linear-gradient(135deg, #d45a6a, #a8354a);
+            line-height: 1;
+            background: var(--primary);
+            color: white;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(212, 90, 106, 0.3);
+        }
+        .logo-text h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
         }
-        .sub {
-            color: #8a6a6a;
-            margin-top: 0.4rem;
-            font-size: 1.05rem;
+        .logo-text .sub {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            -webkit-text-fill-color: var(--text-light);
+            letter-spacing: 4px;
         }
-        .entry {
+        .sunflower {
+            display: inline-block;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== 搜索 & 分类筛选 ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 2rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
             background: white;
-            border-radius: 24px;
-            padding: 1.8rem 2rem;
-            margin-bottom: 1.8rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-            border-left: 6px solid #f0a8a8;
-            transition: transform 0.15s;
-        }
-        .entry:hover { transform: translateX(4px); }
-        .entry h2 {
-            font-size: 1.7rem;
-            color: #b34a5a;
-            margin-bottom: 0.3rem;
-        }
-        .entry .album {
-            font-size: 0.85rem;
-            color: #b88a8a;
-            background: #f5ecec;
-            display: inline-block;
-            padding: 0.15rem 1rem;
-            border-radius: 30px;
-            margin-bottom: 0.8rem;
-        }
-        .entry .lyric {
-            background: #f8f0ee;
-            padding: 0.8rem 1.2rem;
-            border-radius: 16px;
-            font-style: italic;
-            color: #5a3e3e;
-            margin: 0.6rem 0 0.8rem 0;
-            font-size: 1.05rem;
-        }
-        .entry .analysis {
-            line-height: 1.8;
-            color: #3a2e2a;
-            font-size: 1rem;
-        }
-        .entry .analysis strong {
-            color: #c24a5a;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 3.5rem;
-            padding-top: 1.8rem;
-            border-top: 2px solid #eee4e4;
-            color: #9a7a7a;
-            font-size: 0.9rem;
-        }
-        .badge {
-            display: inline-block;
-            background: #d45a6a;
-            color: white;
-            padding: 0.2rem 1.4rem;
             border-radius: 40px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus-within {
+            border-color: var(--primary);
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: transparent;
+        }
+        .search-box button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 22px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-box button:hover {
+            background: var(--primary-dark);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-btn {
+            padding: 8px 18px;
+            border: 2px solid var(--primary-light);
+            border-radius: 40px;
+            background: white;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ===== 统计信息 ===== */
+        .stats {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+        }
+        .stats span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ===== 文章卡片 ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.8rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 6px solid var(--primary-light);
+            transition: transform 0.15s, box-shadow 0.2s;
+            display: block;
+        }
+        .card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 32px rgba(180, 80, 80, 0.12);
+        }
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 10px 16px;
+            margin-bottom: 0.5rem;
+        }
+        .card h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+        }
+        .card .category-tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 2px 14px;
+            border-radius: 30px;
             font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
+        .card .meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .card .meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card .excerpt {
+            color: #3a2e2a;
+            line-height: 1.7;
+            font-size: 0.98rem;
+        }
+        .card .excerpt strong {
+            color: var(--primary);
+        }
+        .card .read-more {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .card .read-more:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        /* ===== 空状态 ===== */
+        .empty {
+            text-align: center;
+            padding: 4rem 0;
+            color: var(--text-light);
+        }
+        .empty .big {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== 页脚 ===== */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--primary-light);
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+        .footer .brand {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ===== 响应式 ===== */
         @media (max-width: 640px) {
-            h1 { font-size: 2rem; }
-            .entry { padding: 1.2rem; }
+            .logo-text h1 { font-size: 1.6rem; }
+            .logo-icon { width: 48px; height: 48px; font-size: 2rem; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .filter-group { justify-content: center; }
+            .card { padding: 1.2rem; }
+            .card h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
+
 <div class="container">
+
+    <!-- ===== 头部 LOGO ===== -->
     <header>
-        <h1>🌻 日向坂46 · 歌词深度解读</h1>
-        <p class="sub">每一句歌词，都是一次心灵的共振</p>
-        <p style="margin-top: 0.6rem;"><span class="badge">🎵 ひなたの歌、ひなたの物語</span></p>
+        <div class="logo-wrap">
+            <div class="logo-icon">🌻</div>
+            <div class="logo-text">
+                <h1>日向坂46 · 深度库</h1>
+                <div class="sub">HINATAZAKA · ひなたの言葉</div>
+            </div>
+        </div>
+        <p style="margin-top: 0.6rem; color: var(--text-light); font-size: 0.9rem;">
+            ✦ 歌词解读 · 成员性格 · 人际关系 · 更多 ✦
+        </p>
     </header>
 
-    <!-- ========== 在这里粘贴您的解读 ========== -->
-    <!-- 格式：复制下面这块，改内容即可 -->
-    
-    <div class="entry">
-        <h2>キュン</h2>
-        <span class="album">📀 1st Single</span>
-        <div class="lyric">「君にキュンとしたんだ」</div>
-        <div class="analysis">
-            <strong>解读：</strong> 这句歌词表达了 <strong>一见钟情</strong> 的纯粹悸动。日向坂用 "キュン" 这个拟声词，把抽象的恋爱心动具象化，仿佛能听见心跳漏拍的声音。搭配轻快的旋律，传递出 <strong>"喜欢就是喜欢，不需要理由"</strong> 的青春态度。
+    <!-- ===== 搜索 & 筛选 ===== -->
+    <div class="toolbar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜索文章标题或内容..." oninput="render()" />
+            <button onclick="document.getElementById('searchInput').value='';render();">✕</button>
+        </div>
+        <div class="filter-group" id="filterGroup">
+            <!-- 分类按钮由 JS 动态生成 -->
         </div>
     </div>
 
-    <div class="entry">
-        <h2>ドレミソラシド</h2>
-        <span class="album">📀 2nd Single</span>
-        <div class="lyric">「ドレミソラシド 歌えば 世界は変わる」</div>
-        <div class="analysis">
-            <strong>解读：</strong> 用音阶作歌名，寓意 <strong>"音乐就是快乐本身"</strong>。歌词鼓励大家在困境中也要唱出来，因为歌声能改变世界。这不仅是日向坂的核心理念 —— <strong>"快乐即是正义"</strong>，也是她们给所有听众的温柔鼓励。
-        </div>
-    </div>
+    <!-- ===== 统计 ===== -->
+    <div class="stats" id="stats">共 <span id="totalCount">0</span> 篇文章</div>
 
-    <div class="entry">
-        <h2>キツネ</h2>
-        <span class="album">📀 3rd Single</span>
-        <div class="lyric">「私はキツネ あなたを惑わせる」</div>
-        <div class="analysis">
-            <strong>解读：</strong> 以 <strong>"狐狸"</strong> 为意象，表面是诱惑，深层是对 <strong>"偶像与粉丝关系"</strong> 的巧妙隐喻 —— 互相吸引、互相迷惑，但又充满欢笑。编曲中的狐步舞更强化了俏皮感，是一首把 <strong>"玩"</strong> 做到极致的作品。
-        </div>
-    </div>
+    <!-- ===== 文章列表 ===== -->
+    <div id="articleList"></div>
 
-    <!-- 👇 您可以继续追加，复制上面的 <div class="entry">...</div> 块即可 -->
-    <!-- 比如新增一首《僕なんか》 -->
-    <div class="entry">
-        <h2>僕なんか</h2>
-        <span class="album">📀 4th Single</span>
-        <div class="lyric">「僕なんか 君のためなら 強くなれる」</div>
-        <div class="analysis">
-            <strong>解读：</strong> 这是一首 <strong>自我怀疑与自我超越</strong> 交织的歌。"僕なんか"（像我这样的人）开篇带着自卑，但后半段转向 "为了你能变强"，展现了 <strong>爱让人成长</strong> 的主题。日向坂用这首歌证明了她们不仅能唱快乐，也能驾驭深情。
-        </div>
-    </div>
-
-    <!-- ========== 编辑区结束 ========== -->
-
+    <!-- ===== 页脚 ===== -->
     <div class="footer">
-        <p>☀️ 持续更新中 · 所有解读均为原创 · 欢迎一起探讨</p>
-        <p style="margin-top: 0.3rem; opacity: 0.6; font-size: 0.8rem;">本站使用纯静态 HTML · 您可以在 Notion 或本地编辑内容</p>
+        <span class="brand">🌻 日向坂46 · 深度解读库</span> &mdash; 持续更新中 · 所有内容均为原创
+        <br style="display: none;" />
+        <span style="opacity: 0.6; font-size: 0.8rem;">✧ 在 GitHub 中编辑 articles 数组即可添加新文章 ✧</span>
     </div>
+
 </div>
+
+<script>
+    // ============================================================
+    //  📝 文章数据库 —— 在这里添加/修改/删除文章
+    //  格式说明：
+    //    id: 唯一编号（数字）
+    //    title: 文章标题
+    //    category: 分类（必须匹配下面的 categories 列表）
+    //    excerpt: 摘要/内容（支持 <strong> 加粗）
+    //    date: 日期（任意格式）
+    //    tags: 标签数组（可选）
+    // ============================================================
+    const articles = [
+        {
+            id: 1,
+            title: "《キュン》—— 心动的一瞬",
+            category: "歌词解读",
+            excerpt: '「君にキュンとしたんだ」—— 这句歌词用 <strong>拟声词</strong> 把抽象的恋爱心动具象化，仿佛能听见心跳漏拍的声音。日向坂用最直白的语言，传递出 "喜欢就是喜欢" 的青春态度。',
+            date: "2024-01-15",
+            tags: ["1st Single", "青春"]
+        },
+        {
+            id: 2,
+            title: "《キツネ》的狐狸哲学",
+            category: "歌词解读",
+            excerpt: '以 <strong>"狐狸"</strong> 为意象，表面是诱惑，深层是对 <strong>偶像与粉丝关系</strong> 的巧妙隐喻。编曲中的狐步舞更强化了俏皮感，是一首把 "玩" 做到极致的作品。',
+            date: "2024-02-20",
+            tags: ["3rd Single", "隐喻"]
+        },
+        {
+            id: 3,
+            title: "佐々木久美 —— 稳定感的队长",
+            category: "成员性格",
+            excerpt: '作为一期生和队长，佐々木久美以 <strong>超强的稳定感</strong> 著称。在综艺中她总能接住所有成员的梗，是团队的 "定海神针"。私下里却是出了名的 "天然呆"，这种反差让她备受喜爱。',
+            date: "2024-03-10",
+            tags: ["一期生", "队长"]
+        },
+        {
+            id: 4,
+            title: "加藤史帆 × 齊藤京子 —— 最强互补关系",
+            category: "人际关系",
+            excerpt: '加藤史帆的 <strong>元气开朗</strong> 与齊藤京子的 <strong>冷静沉稳</strong> 形成了绝妙的互补。两人在综艺中的互动堪称 "相声组合"，一个负责搞笑，一个负责吐槽，是日向坂最受欢迎的 CP 之一。',
+            date: "2024-04-05",
+            tags: ["CP", "综艺"]
+        },
+        {
+            id: 5,
+            title: "《ドレミソラシド》—— 快乐即正义",
+            category: "歌词解读",
+            excerpt: '用音阶作歌名，寓意 <strong>"音乐就是快乐本身"</strong>。歌词鼓励大家在困境中唱出来，因为歌声能改变世界。这不仅是日向坂的核心理念，也是她们给所有听众的温柔鼓励。',
+            date: "2024-05-12",
+            tags: ["2nd Single", "核心理念"]
+        },
+        {
+            id: 6,
+            title: "小坂菜緒 —— 绝对 C 位的责任与成长",
+            category: "成员性格",
+            excerpt: '作为多次担任 Center 的成员，小坂菜緒承受着 <strong>巨大的期待与压力</strong>。但她用一次次完美的舞台表现证明了自己。她的成长轨迹，是日向坂 "努力终有回报" 的最佳写照。',
+            date: "2024-06-18",
+            tags: ["Center", "一期生"]
+        },
+        {
+            id: 7,
+            title: "日向坂的 "家族感" 从何而来",
+            category: "人际关系",
+            excerpt: '与其他团体不同，日向坂的成员之间有一种独特的 <strong>"家族感"</strong>。这源于她们从 "けやき坂" 时期开始的共同奋斗，以及 "快乐" 这个共同的价值观。成员之间没有竞争，只有互相托底。',
+            date: "2024-07-22",
+            tags: ["团队文化", "けやき坂"]
+        }
+    ];
+
+    // ============================================================
+    //  🏷️ 分类配置 —— 在这里管理所有分类
+    //  添加新分类：在数组中加一个字符串即可
+    // ============================================================
+    const categories = ["全部", "歌词解读", "成员性格", "人际关系", "综艺分析", "专辑赏析"];
+
+    // ============================================================
+    //  ⚙️ 核心渲染逻辑（无需修改）
+    // ============================================================
+    let currentFilter = "全部";
+
+    function render() {
+        const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+        const filtered = articles.filter(a => {
+            const matchCategory = currentFilter === "全部" || a.category === currentFilter;
+            const matchSearch = !keyword || 
+                a.title.toLowerCase().includes(keyword) || 
+                a.excerpt.toLowerCase().includes(keyword) ||
+                (a.tags && a.tags.some(t => t.toLowerCase().includes(keyword)));
+            return matchCategory && matchSearch;
+        });
+
+        // 更新统计
+        document.getElementById('totalCount').textContent = filtered.length;
+
+        // 渲染文章列表
+        const list = document.getElementById('articleList');
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="empty"><div class="big">🌻</div><p>没有找到匹配的文章<br /><span style="font-size:0.85rem;color:var(--text-light);">试试其他关键词或分类</span></p></div>`;
+            return;
+        }
+
+        list.innerHTML = filtered.map(a => `
+            <div class="card">
+                <div class="card-header">
+                    <h2>${a.title}</h2>
+                    <span class="category-tag">${a.category}</span>
+                </div>
+                <div class="meta">
+                    <span>📅 ${a.date}</span>
+                    ${a.tags ? `<span>🏷️ ${a.tags.join(' · ')}</span>` : ''}
+                </div>
+                <div class="excerpt">${a.excerpt}</div>
+                <a href="#" class="read-more" onclick="alert('完整内容正在编辑中...');return false;">阅读全文 →</a>
+            </div>
+        `).join('');
+    }
+
+    // 渲染分类按钮
+    function renderFilters() {
+        const group = document.getElementById('filterGroup');
+        group.innerHTML = categories.map(cat => `
+            <button class="filter-btn ${cat === currentFilter ? 'active' : ''}" 
+                    onclick="currentFilter='${cat}';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');render();">
+                ${cat}
+            </button>
+        `).join('');
+    }
+
+    // 初始化
+    renderFilters();
+    render();
+</script>
+
 </body>
 </html>
