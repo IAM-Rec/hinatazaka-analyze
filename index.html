@@ -8,7 +8,7 @@
         /* ===== 全局重置 & 日向坂主题色 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #D45A6A;      /* 日向坂红 */
+            --primary: #D45A6A;
             --primary-light: #F5E0E0;
             --primary-dark: #A8354A;
             --bg: #FCF8F5;
@@ -33,7 +33,6 @@
             padding: 2rem 0 1.8rem;
             border-bottom: 4px solid var(--primary-light);
             margin-bottom: 2rem;
-            position: relative;
         }
         .logo-wrap {
             display: flex;
@@ -44,7 +43,6 @@
         }
         .logo-icon {
             font-size: 2.8rem;
-            line-height: 1;
             background: var(--primary);
             color: white;
             width: 64px;
@@ -68,14 +66,6 @@
             color: var(--text-light);
             -webkit-text-fill-color: var(--text-light);
             letter-spacing: 4px;
-        }
-        .sunflower {
-            display: inline-block;
-            animation: spin 20s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* ===== 搜索 & 分类筛选 ===== */
@@ -148,7 +138,6 @@
             border-color: var(--primary);
         }
 
-        /* ===== 统计信息 ===== */
         .stats {
             font-size: 0.9rem;
             color: var(--text-light);
@@ -169,7 +158,6 @@
             box-shadow: var(--shadow);
             border-left: 6px solid var(--primary-light);
             transition: transform 0.15s, box-shadow 0.2s;
-            display: block;
         }
         .card:hover {
             transform: translateX(4px);
@@ -211,27 +199,38 @@
         }
         .card .excerpt {
             color: #3a2e2a;
-            line-height: 1.7;
+            line-height: 1.8;
             font-size: 0.98rem;
         }
         .card .excerpt strong {
             color: var(--primary);
         }
-        .card .read-more {
+        .card .excerpt .full-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--primary-light);
+        }
+        .card .excerpt .full-content.show {
+            display: block;
+        }
+        .read-more-btn {
             display: inline-block;
             margin-top: 0.8rem;
             color: var(--primary);
             font-weight: 600;
             font-size: 0.9rem;
-            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
             border-bottom: 2px solid transparent;
             transition: border-color 0.2s;
+            padding: 0;
         }
-        .card .read-more:hover {
+        .read-more-btn:hover {
             border-bottom-color: var(--primary);
         }
 
-        /* ===== 空状态 ===== */
         .empty {
             text-align: center;
             padding: 4rem 0;
@@ -242,7 +241,6 @@
             margin-bottom: 1rem;
         }
 
-        /* ===== 页脚 ===== */
         .footer {
             text-align: center;
             margin-top: 3rem;
@@ -256,7 +254,6 @@
             font-weight: 600;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 640px) {
             .logo-text h1 { font-size: 1.6rem; }
             .logo-icon { width: 48px; height: 48px; font-size: 2rem; }
@@ -271,7 +268,6 @@
 
 <div class="container">
 
-    <!-- ===== 头部 LOGO ===== -->
     <header>
         <div class="logo-wrap">
             <div class="logo-icon">🌻</div>
@@ -285,24 +281,17 @@
         </p>
     </header>
 
-    <!-- ===== 搜索 & 筛选 ===== -->
     <div class="toolbar">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="🔍 搜索文章标题或内容..." oninput="render()" />
             <button onclick="document.getElementById('searchInput').value='';render();">✕</button>
         </div>
-        <div class="filter-group" id="filterGroup">
-            <!-- 分类按钮由 JS 动态生成 -->
-        </div>
+        <div class="filter-group" id="filterGroup"></div>
     </div>
 
-    <!-- ===== 统计 ===== -->
-    <div class="stats" id="stats">共 <span id="totalCount">0</span> 篇文章</div>
-
-    <!-- ===== 文章列表 ===== -->
+    <div class="stats">共 <span id="totalCount">0</span> 篇文章</div>
     <div id="articleList"></div>
 
-    <!-- ===== 页脚 ===== -->
     <div class="footer">
         <span class="brand">🌻 日向坂46 · 深度解读库</span> &mdash; 持续更新中 · 所有内容均为原创
         <br style="display: none;" />
@@ -313,82 +302,182 @@
 
 <script>
     // ============================================================
-    //  📝 文章数据库 —— 在这里添加/修改/删除文章
-    //  格式说明：
-    //    id: 唯一编号（数字）
-    //    title: 文章标题
-    //    category: 分类（必须匹配下面的 categories 列表）
-    //    excerpt: 摘要/内容（支持 <strong> 加粗）
-    //    date: 日期（任意格式）
-    //    tags: 标签数组（可选）
+    //  📝 文章数据库
     // ============================================================
     const articles = [
         {
             id: 1,
-            title: "《キュン》—— 心动的一瞬",
+            title: "上村ひなの《好きじゃないんだ》—— 偶像工业的自欺解剖学",
             category: "歌词解读",
-            excerpt: '「君にキュンとしたんだ」—— 这句歌词用 <strong>拟声词</strong> 把抽象的恋爱心动具象化，仿佛能听见心跳漏拍的声音。日向坂用最直白的语言，传递出 "喜欢就是喜欢" 的青春态度。',
-            date: "2024-01-15",
-            tags: ["1st Single", "青春"]
-        },
-        {
-            id: 2,
-            title: "《キツネ》的狐狸哲学",
-            category: "歌词解读",
-            excerpt: '以 <strong>"狐狸"</strong> 为意象，表面是诱惑，深层是对 <strong>偶像与粉丝关系</strong> 的巧妙隐喻。编曲中的狐步舞更强化了俏皮感，是一首把 "玩" 做到极致的作品。',
-            date: "2024-02-20",
-            tags: ["3rd Single", "隐喻"]
-        },
-        {
-            id: 3,
-            title: "佐々木久美 —— 稳定感的队长",
-            category: "成员性格",
-            excerpt: '作为一期生和队长，佐々木久美以 <strong>超强的稳定感</strong> 著称。在综艺中她总能接住所有成员的梗，是团队的 "定海神针"。私下里却是出了名的 "天然呆"，这种反差让她备受喜爱。',
-            date: "2024-03-10",
-            tags: ["一期生", "队长"]
-        },
-        {
-            id: 4,
-            title: "加藤史帆 × 齊藤京子 —— 最强互补关系",
-            category: "人际关系",
-            excerpt: '加藤史帆的 <strong>元气开朗</strong> 与齊藤京子的 <strong>冷静沉稳</strong> 形成了绝妙的互补。两人在综艺中的互动堪称 "相声组合"，一个负责搞笑，一个负责吐槽，是日向坂最受欢迎的 CP 之一。',
-            date: "2024-04-05",
-            tags: ["CP", "综艺"]
-        },
-        {
-            id: 5,
-            title: "《ドレミソラシド》—— 快乐即正义",
-            category: "歌词解读",
-            excerpt: '用音阶作歌名，寓意 <strong>"音乐就是快乐本身"</strong>。歌词鼓励大家在困境中唱出来，因为歌声能改变世界。这不仅是日向坂的核心理念，也是她们给所有听众的温柔鼓励。',
-            date: "2024-05-12",
-            tags: ["2nd Single", "核心理念"]
-        },
-        {
-            id: 6,
-            title: "小坂菜緒 —— 绝对 C 位的责任与成长",
-            category: "成员性格",
-            excerpt: '作为多次担任 Center 的成员，小坂菜緒承受着 <strong>巨大的期待与压力</strong>。但她用一次次完美的舞台表现证明了自己。她的成长轨迹，是日向坂 "努力终有回报" 的最佳写照。',
-            date: "2024-06-18",
-            tags: ["Center", "一期生"]
-        },
-        {
-            id: 7,
-            title: "日向坂的 "家族感" 从何而来",
-            category: "人际关系",
-            excerpt: '与其他团体不同，日向坂的成员之间有一种独特的 <strong>"家族感"</strong>。这源于她们从 "けやき坂" 时期开始的共同奋斗，以及 "快乐" 这个共同的价值观。成员之间没有竞争，只有互相托底。',
-            date: "2024-07-22",
-            tags: ["团队文化", "けやき坂"]
+            excerpt: `这首歌是日向坂46上村ひなの演唱的一首关于「自我认知崩塌」的哲学独白。歌词讲述了一个人向所有人宣称自己有「最爱的一本书」，却完全想不起书名——最终发现那本书根本不存在。
+
+本文将从四个维度进行深度解剖：叙事结构、核心隐喻、心理动机、思想内核，并进一步探讨这首歌与偶像工业之间惊人的互文关系。`,
+
+            // 完整内容（点击"阅读全文"后展开）
+            fullContent: `
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🎯 引论：偶像工业与"自欺"的结构性同构</p>
+
+            <p>在聊这首歌之前，我们需要先建立一个大前提——<strong>偶像工业的本质，就是一场集体性的"自欺"契约。</strong></p>
+
+            <ul style="margin:0.8rem 0 0.8rem 1.8rem; line-height:2;">
+                <li><strong>运营方</strong>提供"触手可及的梦想"和"成长中的未完成态"</li>
+                <li><strong>偶像本人</strong>扮演那个"正在努力成为理想自我"的角色</li>
+                <li><strong>粉丝</strong>则自愿相信这个虚构，从中获得情感投射和慰藉</li>
+            </ul>
+
+            <p>三方都心知肚明"这只是一场演出"，但都默契地不戳破。这就是萨特所说的<strong>"集体自欺"</strong>——一种被制度化、商业化、合法化的自我欺骗。</p>
+
+            <p>而上村ひなの作为日向坂46的现役偶像，唱出这首歌，本身就构成了一枚<strong>投向自己职业根基的回旋镖</strong>。</p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">📖 一、叙事结构：一场"寻找"引发的精神考古</p>
+
+            <p>歌词遵循一个清晰的<strong>侦探式叙事线</strong>，但调查对象不是案件，而是"自我"。</p>
+
+            <p><strong>1. 案发（第一段）</strong>：宣称"最喜欢"的书，书名却完全想不起来。结论直给——<strong>"其实没那么喜欢"</strong>。这是对表层意识的第一次背叛。</p>
+
+            <p><strong>2. 追查动机（第二、三段）</strong>：为什么我们会虚构"喜欢"？因为现实中的"理想自我"像滑溜的鱼，永远抓不住。所谓的理想，只是<strong>"让人不放弃的胡萝卜"</strong>，是被基因改造过的虚假欲望。</p>
+
+            <p><strong>3. 现场勘查（念白部分）</strong>：这是全曲的<strong>"高光转折"</strong>。记住封面、字体，却忘了标题；翻遍老家，书根本不存在。这暴露了真相：记忆的细节越清晰（包装），核心内容（本质）越空洞。</p>
+
+            <p><strong>4. 结案陈词（结尾）</strong>：那本书是<strong>"想象中的记忆"</strong>，是自行编造的"理想的我"。最后反复质问"好きじゃないのか"（是不是不喜欢），终于承认——<strong>我渴望的根本不是这本书，而是"拥有最爱的书"的那个自己。</strong></p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🔑 二、核心隐喻："小说"与"书名"的二元对立</p>
+
+            <table style="width:100%; border-collapse:collapse; margin:0.8rem 0; font-size:0.95rem;">
+                <tr style="background:var(--primary-light);">
+                    <th style="padding:10px 16px; border:1px solid #e0c8c8; text-align:left;">元素</th>
+                    <th style="padding:10px 16px; border:1px solid #e0c8c8; text-align:left;">象征意义</th>
+                    <th style="padding:10px 16px; border:1px solid #e0c8c8; text-align:left;">特征</th>
+                </tr>
+                <tr>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;"><strong>"小说"本身</strong></td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">理想化的自我形象（那个"想成为的人"）</td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">被宣称、被展示给他人看的外壳</td>
+                </tr>
+                <tr style="background:#f8f0ee;">
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;"><strong>"书名"</strong></td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">那个形象的核心本质/真实动机</td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">本应脱口而出，却空洞、被遗忘</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;"><strong>"封面和字体"</strong></td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">外在的人设包装（品味、谈吐、社交形象）</td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">记得很清楚，因为那是给别人看的</td>
+                </tr>
+                <tr style="background:#f8f0ee;">
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;"><strong>"书不存在"</strong></td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">理想自我的虚构性</td>
+                    <td style="padding:10px 16px; border:1px solid #e0c8c8;">从一开始就是"想象中"的产物</td>
+                </tr>
+            </table>
+
+            <p><strong>残酷的真相是</strong>：我们往往把"记得封面"误认为"读过这本书"，就像把"经营人设"误认为"活出自我"。书名（本质）的缺失，暴露了全书（整个人设）的虚无。</p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🧠 三、心理动机：为什么我们要"假装喜欢"？</p>
+
+            <p><strong>1. 为了迎合社会期待</strong><br />"知性的、时髦的形象"——这不是自发的喜好，而是为了<strong>操纵他人眼中的印象</strong>。通过宣称"喜欢某本书"，我们在给自己贴标签，换取社交认同。</p>
+
+            <p><strong>2. 为了逃避真实的自我审视</strong><br />"一边妥协一边死要面子""把从前的谎言继续贯彻下去"——因为承认"我没那么喜欢"就等于承认"我成不了理想中的自己"。为了不面对这个痛苦，我们选择<strong>继续演戏</strong>，哪怕漏洞百出。</p>
+
+            <p><strong>3. 为了填补存在性空虚</strong><br />"渴望某个谁也不知道的东西"——这句话暴露了根源：我们虚构"最爱"，是因为内心有个空洞，需要用一个<strong>"独一无二的执着"</strong>来填满。即使那个东西不存在，捏造一个也比面对空虚要好。</p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">💭 四、思想内核：成长的本质是"幻灭的堆叠"</p>
+
+            <p>这首歌的深度在于，它把<strong>"忘记书名"</strong>拔高到了<strong>"成人式的觉醒"</strong>。</p>
+
+            <p><strong>关于"喜欢"的祛魅</strong>：真正的喜欢是不需要用力记住的。当你需要"宣称"你喜欢什么，那个东西往往只是你的欲望投射，而非本心。歌词反复强调的"好きじゃない"（不喜欢），不是否定那本书，而是<strong>否定那个用谎言堆砌出来的虚假自我</strong>。</p>
+
+            <p><strong>关于"理想"的清算</strong>：歌词直言"理想是白日梦""人成不了想成为的自己"。这不是消极，而是一种<strong>残酷的清醒</strong>。长大成人的过程，就是不断发现"我以为的我"和"真实的我"之间那条鸿沟，并承认那条鸿沟无法弥合。</p>
+
+            <p><strong>最后的悖论</strong>：结尾"僕は…好きじゃないんだ"（我就是不喜欢啊）——这句话看似是彻底的否定，但请注意：<strong>能如此清醒地否定虚假的"喜欢"，恰恰是"真实"的开始。</strong>承认那本书不存在，承认那个理想自己是编造的，主人公才第一次从"扮演"中走出来。</p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🎭 五、互文性爆破：偶像唱"不喜欢"，意味着什么？</p>
+
+            <p>这首歌最大的"冒犯性"在于副歌那句不断重复的<strong>"好きじゃないんだ"</strong>。</p>
+
+            <p>在偶像文化的语法里，这是一个<strong>禁忌句式</strong>。因为偶像卖的就是"喜欢"——粉丝喜欢你，你要喜欢粉丝，你要喜欢舞台，你要喜欢这个工作。任何"不喜欢"的公开表达，都会被解读为对粉丝的背叛、对职业的不尊重、对"梦想"的亵渎。</p>
+
+            <p>而这首歌允许一个偶像站在麦克风前，一遍又一遍地质问自己、最终承认：<strong>"我宣称喜欢的东西，我其实没那么喜欢。"</strong></p>
+
+            <p>这里产生了<strong>三重互文性的爆破</strong>：</p>
+
+            <ul style="margin:0.8rem 0 0.8rem 1.8rem; line-height:2;">
+                <li><strong>歌词角色</strong>："我"发现最爱的小说并不存在 → 个人层面的自我幻灭</li>
+                <li><strong>演唱者</strong>：上村ひなの以偶像身份唱出"我不喜欢" → 职业层面的禁忌打破</li>
+                <li><strong>听众（粉丝）</strong>：正在听这首歌的人，恰恰是因为"喜欢"上村ひなの才在听 → 你喜欢的偶像正在唱"我不喜欢"，你的喜欢建立在什么之上？</li>
+            </ul>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">✍️ 六、秋元康的自反性写作</p>
+
+            <p>这首歌的作词者是秋元康——日本偶像产业的<strong>最大操盘手</strong>。他亲手制造了数以百计的偶像人设，却写下这样一首<strong>拆穿"人设叙事"本身的歌</strong>，交给自己的偶像去唱。</p>
+
+            <p>这是一种非常高级的<strong>"自反性"策略</strong>：</p>
+
+            <ul style="margin:0.8rem 0 0.8rem 1.8rem; line-height:2;">
+                <li><strong>表层</strong>：这是一首文艺的、有深度的、探讨自我认知的歌</li>
+                <li><strong>中层</strong>：偶像唱了，显得"有思想深度"，提升了偶像的艺术人格</li>
+                <li><strong>深层</strong>：歌的内容恰恰在解构"偶像人格"的虚构性——但你买票进来听的，就是这个虚构</li>
+            </ul>
+
+            <p>于是形成一个<strong>完美的闭环</strong>：你消费的是"拆穿虚构"的这个行为本身，而"拆穿虚构"被包装成了新的虚构商品。秋元康站在这个闭环之上，微笑着收钱。</p>
+
+            <p><strong>这首歌批判"自欺"，但它的诞生和流通，本身就是"自欺"产业链上的一环。</strong></p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🔮 最终追问：唱完这首歌之后，然后呢？</p>
+
+            <p>上村ひなの唱完"好きじゃないんだ"之后——她明天还是要上台，还是要笑着挥手，还是要说"最喜欢大家了"。</p>
+
+            <p><strong>"自欺"被揭穿后，并不会消失；它会被重新折叠，变成"知情的自欺"。</strong></p>
+
+            <p>萨特说，自欺的可怕之处在于：即使你意识到了自欺，你仍然可以选择继续自欺，并且这时你连"不知情"这个借口都没有了。</p>
+
+            <p>唱完这首歌的上村ひなの，如果第二天继续笑着说"最喜欢偶像这份工作了"——那她就从"被包装的偶像"变成了<strong>"知情却继续扮演的偶像"</strong>。后者比前者更复杂，也更有悲剧性。</p>
+
+            <p>而粉丝呢？听完这首歌的粉丝，如果第二天继续举着应援棒喊"最喜欢你了"——那他们也是<strong>知情却继续参与这场游戏的共谋者</strong>。</p>
+
+            <hr style="margin:1.5rem 0; border:1px dashed var(--primary-light);" />
+
+            <p style="font-size:1.05rem; font-weight:600; color:var(--primary-dark); margin-bottom:1rem;">🎬 结语</p>
+
+            <p>这不是一首"反偶像"的歌，而是一首<strong>"关于偶像真相"</strong>的歌。</p>
+
+            <p>它没有砸碎偶像工业，恰恰相反——<strong>它让偶像工业变得更丰富了。</strong></p>
+
+            <p>因为它证明了：这个系统强大到<strong>连"自我解构"都可以作为商品来售卖</strong>。一个偶像可以在台上唱"我的喜欢是假的"，而观众会为这场"真实"鼓掌——然后所有人继续扮演各自的角色。</p>
+
+            <p>你问我这是不是一种更高级的虚伪？</p>
+
+            <p style="font-weight:600; color:var(--primary-dark);">我想说：<strong>是的。但"意识到这是虚伪"本身，就是这首歌送给每一个听众的、唯一的真实。</strong></p>
+
+            <p style="margin-top:0.8rem; color:var(--text-light);">而这，大概就是秋元康想让你花320日元下载这首歌时，真正买到的东西。😌</p>
+            `,
+
+            date: "2026-07-22",
+            tags: ["上村ひなの", "秋元康", "自欺", "偶像工业", "哲学"]
         }
     ];
 
     // ============================================================
-    //  🏷️ 分类配置 —— 在这里管理所有分类
-    //  添加新分类：在数组中加一个字符串即可
+    //  🏷️ 分类配置
     // ============================================================
     const categories = ["全部", "歌词解读", "成员性格", "人际关系", "综艺分析", "专辑赏析"];
 
     // ============================================================
-    //  ⚙️ 核心渲染逻辑（无需修改）
+    //  ⚙️ 渲染逻辑
     // ============================================================
     let currentFilter = "全部";
 
@@ -396,24 +485,25 @@
         const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
         const filtered = articles.filter(a => {
             const matchCategory = currentFilter === "全部" || a.category === currentFilter;
-            const matchSearch = !keyword || 
-                a.title.toLowerCase().includes(keyword) || 
+            const matchSearch = !keyword ||
+                a.title.toLowerCase().includes(keyword) ||
                 a.excerpt.toLowerCase().includes(keyword) ||
                 (a.tags && a.tags.some(t => t.toLowerCase().includes(keyword)));
             return matchCategory && matchSearch;
         });
 
-        // 更新统计
         document.getElementById('totalCount').textContent = filtered.length;
 
-        // 渲染文章列表
         const list = document.getElementById('articleList');
         if (filtered.length === 0) {
             list.innerHTML = `<div class="empty"><div class="big">🌻</div><p>没有找到匹配的文章<br /><span style="font-size:0.85rem;color:var(--text-light);">试试其他关键词或分类</span></p></div>`;
             return;
         }
 
-        list.innerHTML = filtered.map(a => `
+        list.innerHTML = filtered.map(a => {
+            const hasFull = a.fullContent && a.fullContent.trim().length > 0;
+            const contentId = `full-${a.id}`;
+            return `
             <div class="card">
                 <div class="card-header">
                     <h2>${a.title}</h2>
@@ -423,24 +513,40 @@
                     <span>📅 ${a.date}</span>
                     ${a.tags ? `<span>🏷️ ${a.tags.join(' · ')}</span>` : ''}
                 </div>
-                <div class="excerpt">${a.excerpt}</div>
-                <a href="#" class="read-more" onclick="alert('完整内容正在编辑中...');return false;">阅读全文 →</a>
+                <div class="excerpt">
+                    ${a.excerpt}
+                    ${hasFull ? `
+                        <div class="full-content" id="${contentId}">
+                            ${a.fullContent}
+                        </div>
+                        <button class="read-more-btn" onclick="toggleFull('${contentId}', this)">📖 阅读全文 ↓</button>
+                    ` : ''}
+                </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
-    // 渲染分类按钮
+    function toggleFull(id, btn) {
+        const el = document.getElementById(id);
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
+            btn.textContent = '📖 阅读全文 ↓';
+        } else {
+            el.classList.add('show');
+            btn.textContent = '📖 收起全文 ↑';
+        }
+    }
+
     function renderFilters() {
         const group = document.getElementById('filterGroup');
         group.innerHTML = categories.map(cat => `
-            <button class="filter-btn ${cat === currentFilter ? 'active' : ''}" 
+            <button class="filter-btn ${cat === currentFilter ? 'active' : ''}"
                     onclick="currentFilter='${cat}';document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');render();">
                 ${cat}
             </button>
         `).join('');
     }
 
-    // 初始化
     renderFilters();
     render();
 </script>
